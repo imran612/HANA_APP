@@ -1,0 +1,50 @@
+ID: HANA_APP
+_schema-version: '2.0'
+version: 0.0.1
+modules:
+  - name: web
+    type: html5
+    path: web
+    requires:
+      - name: core_xsjs_api
+        properties:
+          name: core-xsjs-backend
+          url: '~{url}'
+          forwardAuthToken: true
+        group: destinations
+      - name: UAA-service
+      - name: ui5
+  - name: db
+    type: hdb
+    path: db
+    requires:
+      - name: hdi_db
+  - name: core_xsjs
+    type: nodejs
+    path: core_xsjs
+    provides:
+      - name: core_xsjs_api
+        properties:
+          url: '${default-url}'
+    requires:
+      - name: UAA-service
+      - name: hdi_db
+      - name: db
+resources:
+  - name: UAA-service
+    type: com.sap.xs.uaa-space
+    description: uaa-service
+    parameters:
+      config-path: ./xs-security.json
+  - name: hdi_db
+    parameters:
+      config:
+        schema: poschema
+    properties:
+      hdi-container-name: '${service-name}'
+    type: com.sap.xs.hdi-container
+  - name: ui5
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: sapui5_sb
+      service-plan: sapui5-1.52
